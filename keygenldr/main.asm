@@ -180,7 +180,7 @@ dump_state:
 
 // PRECONDITION: $r10 == 0
 // mov b32 $r11 $r0
-// lcall crypto_store
+// lcall crypto_store // This do shr b32 $r10 0x10 and or $r11 $r10
 // mpopret $r0
 .b32 0x6b1
 .b32 1
@@ -195,6 +195,9 @@ dump_state:
 // .b32 0x537
 // .b32 0
 
+
+// r10 = 1
+// r11 = 1
 // call gen_usr_key
 .b32 0x647
 

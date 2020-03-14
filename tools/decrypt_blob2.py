@@ -10,7 +10,7 @@ from Crypto.Cipher import AES
 from Crypto.Hash import CMAC
 
 
-with open("key.bin", 'rb') as f:
+with open("blob2_aes_key.bin", 'rb') as f:
     blob2_aes_key = f.read()
     print(binascii.hexlify(blob2_aes_key))
 
