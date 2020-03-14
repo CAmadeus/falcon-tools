@@ -146,7 +146,8 @@ start_exploit:
     ret
 
 resume_from_hsec:
-    mov b32 $r10 $r11
+    // We setup in the ropchain $r11 to the good destination address, but we cannot trust it to haven't modified it
+    mov $r10 0
     lcall #tsec_set_key
 
     mov $r10 0xB0B0B0B0
