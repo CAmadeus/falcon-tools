@@ -37,7 +37,6 @@ def generate_firmware(blob0_path, blob1_path, blob1_auth_hash, output_path):
 
     if blob0_size > 0x300:
         print("Warning: blob0_size > 0x300 (aligned size: 0x%x, unaligned size: 0x%x)" % (blob0_size, blob0_size_unaligned))
-        print("HOVI next stages wouldn't work!")
 
     key_data = struct.pack("16s16s16s16s16s16s16sIIIII124x", debug_key,
          blob0_auth_hash,

@@ -115,7 +115,6 @@ main:
 include(`memcpy.asm')
 include(`memcpy_d2i.asm')
 include(`memcpy_i2d.asm')
-include(`memcpy_i2d_testing.asm')
 include(`tsec_wait_dma.asm')
 include(`tsec_dma_write.asm')
 include(`tsec_set_key.asm')
