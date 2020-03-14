@@ -162,9 +162,46 @@ resume_from_hsec:
 
     exit
 
+dump_state:
+    //mov b32 $r10 $r11
+
+    // Result code
+    mov b32 $r15 $r10
+    mov $r9 0x1100
+    iowr I[$r9] $r15
+    exit
+
 // Start of the ROP chain
 .size 0x998
 
+// mpopret $r0
+.b32 0x6b7
+.b32 1
+
+// PRECONDITION: $r10 == 0
+// mov b32 $r11 $r0
+// lcall crypto_store
+// mpopret $r0
+.b32 0x6b1
+.b32 1
+
+// mov $r10 0x1
+.b32 0x5b8
+
+// PRECONDITION: $r11 == 0
+// mov $r10 $r0
+// lcall 0x888
+// mpopret $r0
+// .b32 0x537
+// .b32 0
+
+// call gen_usr_key
+.b32 0x647
+
+// DEBUG
+// .b32 #dump_state
+
+// now write to DRAM the crypto register!
 
 // mpopret $r0
 .b32 0x6b7
@@ -174,15 +211,14 @@ resume_from_hsec:
 // lcall crypto_store
 // mpopret $r0
 .b32 0x6b1
-.b32 6
+.b32 4
 
+// PRECONDITION: $r11 == 0
 // mov $r10 $r0
 // lcall 0x888
-// mov $r10 $r0
 // mpopret $r0
 .b32 0x537
 .b32 0
-
 
 // mov b32 $r11 $r0
 // lcall crypto_store
