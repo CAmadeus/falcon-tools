@@ -64,8 +64,8 @@ def extract_fw(fw_path, output_path):
             blob_pos += 0x100
         blob_pos = dump_blob(output_path + "/blob1.bin", fw_data, blob_pos, blob1_size)
         blob_pos = dump_blob(output_path + "/blob2.bin", fw_data, blob_pos, blob2_size)
-        blob_pos = dump_blob(output_path + "/blob3.bin", fw_data, blob_pos, blob3_size)
         blob_pos = dump_blob(output_path + "/blob4.bin", fw_data, blob_pos, blob4_size)
+        blob_pos = dump_blob(output_path + "/blob3.bin", fw_data, blob_pos, blob3_size)
 
 def main(args):
     if len(args) != 1:
