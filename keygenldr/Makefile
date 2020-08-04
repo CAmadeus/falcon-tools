@@ -3,15 +3,21 @@ PACKED_NAME := tsec_fw
 STAGE1_PATH = ../payloads/hovi/1.0.0/keygenldr.bin
 STAGE1_AUTH = 9c8b75d3df0bf06c95fc91c0761ef062
 
+KEYGENLDR_DIR = .
 LIBFAUCON_DIR = ../libfaucon
 TOOLS_DIR = ../tools
+
+# Set this value to the name of the ROP chain that you want to use.
+# Supported values: code_sig_01, code_enc_01
+DESIRED_ROP_CHAIN = code_enc_01
 
 LIBFAUCON_SOURCES = $(wildcard LIBFAUCON_DIR/*.asm)
 
 all: $(PACKED_NAME).h
 
 $(NAME)_fw_real.asm: $(NAME).asm $(LIBFAUCON_SOURCES)
-	@m4 -I $(LIBFAUCON_DIR) $(NAME).asm > $@
+	@cp $(DESIRED_ROP_CHAIN)_rop.asm rop.asm
+	@m4 -I $(LIBFAUCON_DIR) -I $(KEYGENLDR_DIR) $(NAME).asm > $@
 
 $(NAME)_fw.bin: $(NAME)_fw_real.asm
 	@envyas -m falcon -V fuc5 -F crypt $? -i -o $@
@@ -29,10 +35,9 @@ print_dis: $(NAME)_fw.bin
 	@envydis -i $? -m falcon -V fuc5 -F crypt -n
 
 clean:
-	@rm -f $(NAME)_fw.h $(NAME)_fw_real.asm $(NAME)_fw.bin $(PACKED_NAME).bin $(PACKED_NAME).h
+	@rm -f $(NAME)_fw.h $(NAME)_fw_real.asm rop.asm $(NAME)_fw.bin $(PACKED_NAME).bin $(PACKED_NAME).h
 
 
 re: clean all
 
-.PHONY: $(NAME)_fw.h $(NAME)_fw_real.asm $(NAME)_fw.bin $(PACKED_NAME).bin $(PACKED_NAME).h
-
+.PHONY: $(NAME)_fw.h $(NAME)_fw_real.asm rop.asm $(NAME)_fw.bin $(PACKED_NAME).bin $(PACKED_NAME).h

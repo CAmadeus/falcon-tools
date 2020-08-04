@@ -1,7 +1,6 @@
 include(`base_define.asm')
 include(`forloop.m4')
 
-
 .equ #KEY_DATA_SIZE 0x7C
 .equ #BLOB1_PHYS_ADDR 0x400
 .equ #BLOB1_VIRT_ADDR 0x300
@@ -15,14 +14,15 @@ _start:
     mov $sp $r13
     lcall #main
     exit
-// Add some padding to align next value
+
+// The physical address of the key data blob, overridden by the repacker.
 .b8 0
 .b8 0
 .b8 0
-// overriten by the repacker
 KEY_DATA_PHYS_ADDR: .b32 0x300
+
 main:
-    // setup stack
+    // Setup the stack.
     mov $r15 -0x10
     add $sp -0x11c
 
@@ -103,13 +103,15 @@ main:
     xdst $r8 $r7
     xdwait
 
+    // Let it begin...
     lcall #start_exploit
 
+    // Store an according result value in Falcon scratch 1.
     mov $r10 0xB0B0B0B0
-    // Result code
     mov b32 $r15 $r10
     mov $r9 0x1100
-    //iowr I[$r9] $r15
+    iowr I[$r9] $r15
+
     mpopaddret $r8 0x11c
 
 include(`memcpy.asm')
@@ -120,115 +122,40 @@ include(`tsec_dma_write.asm')
 include(`tsec_set_key.asm')
 
 start_exploit:
-    // use the first scratch register to save sp address
+    // Use Falcon scratch 0 to backup the $sp value.
     mov $r15 $sp
     mov $r9 0x1000
     iowr I[$r9] $r15
 
-    // Jump to HSEC!
-
+    // Set some variables that KeygenLdr depends on.
     // key_buf
     mov b32 $r10 $r4
-
     // key_version
     mov $r11 0x1
-
     // is_stage2_decrypted
     mov $r12 0x0
 
+    // Prepare $sp for the stack smash yet to happen.
     mov $r0 0xA00
     mov $sp $r0
 
-    // lcall #test_stack
+    // Jump into KeygenLdr.
     call $r5
 
-    ret
-
-resume_from_hsec:
-    // We setup in the ropchain $r11 to the good destination address, but we cannot trust it to haven't modified it
-    mov $r10 0
-    lcall #tsec_set_key
-
-    mov $r10 0xB0B0B0B0
-    // Result code
-    mov b32 $r15 $r10
-    mov $r9 0x1100
-    iowr I[$r9] $r15
-
-    // use the first scratch register to restore sp address
+ret2win:
+    // Restore the original $sp value to return to main.
     mov $r9 0x1000
     iord $r15 I[$r9]
     mov $sp $r15
 
-    exit
+    // The ROP chain stores the address of the key buffer in Falcon
+    // DMem. From there, we can output the key through the HDCP MMIOs.
+    clear b32 $r10
+    mov $r10 #ROP_KEY_BUFFER
+    lcall #tsec_set_key
 
-dump_state:
-    //mov b32 $r10 $r11
+    // We're done here, return back to main.
+    ret
 
-    // Result code
-    mov b32 $r15 $r10
-    mov $r9 0x1100
-    iowr I[$r9] $r15
-    exit
-
-// Start of the ROP chain
-.size 0x998
-
-// mpopret $r0
-.b32 0x6b7
-.b32 1
-
-// PRECONDITION: $r10 == 0
-// mov b32 $r11 $r0
-// lcall crypto_store // This do shr b32 $r10 0x10 and or $r11 $r10
-// mpopret $r0
-.b32 0x6b1
-.b32 1
-
-// mov $r10 0x1
-.b32 0x5b8
-
-// PRECONDITION: $r11 == 0
-// mov $r10 $r0
-// lcall 0x888
-// mpopret $r0
-// .b32 0x537
-// .b32 0
-
-
-// r10 = 1
-// r11 = 1
-// call gen_usr_key
-.b32 0x647
-
-// DEBUG
-// .b32 #dump_state
-
-// now write to DRAM the crypto register!
-
-// mpopret $r0
-.b32 0x6b7
-.b32 0
-
-// mov b32 $r11 $r0
-// lcall crypto_store
-// mpopret $r0
-.b32 0x6b1
-.b32 4
-
-// PRECONDITION: $r11 == 0
-// mov $r10 $r0
-// lcall 0x888
-// mpopret $r0
-.b32 0x537
-.b32 0
-
-// mov b32 $r11 $r0
-// lcall crypto_store
-// mpopret $r0
-.b32 0x6b1
-.b32 0
-
-
-// END of ROP chain
-.b32 #resume_from_hsec
+// Start of the ROP chain.
+include(`rop.asm')
