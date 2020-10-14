@@ -37,7 +37,7 @@
 
 // mpopret $r0
 .b32 0x53D
-.b32 0x4  // <- Change this value if you want to dump other crypto registers.
+.b32 0x4
 
 // $r0  = 4
 // -------------------

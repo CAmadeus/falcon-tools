@@ -65,7 +65,6 @@ main:
     clear b32 $r10
     lcall #memcpy_i2d
 
-
     // load blob1 size again???
     ld b32 $r12 D[$r3 + 0x74]
 
