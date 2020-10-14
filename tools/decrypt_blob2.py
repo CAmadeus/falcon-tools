@@ -1,29 +1,27 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-import errno
-import os
-import struct
 import sys
-import binascii
+from binascii import unhexlify
 
 from Crypto.Cipher import AES
-from Crypto.Hash import CMAC
 
 
-with open("blob2_aes_key.bin", 'rb') as f:
-    blob2_aes_key = f.read()
-    print(binascii.hexlify(blob2_aes_key))
+def decrypt_blob2(blob2_path, output_path, key, iv=None):
+    with open(blob2_path, "rb") as f:
+        blob2 = f.read()
 
-blob2_aes_iv = b'00000000000000000000000000000000'
+    if not iv:
+        iv = unhexlify("00000000000000000000000000000000")
+    blob2_dec = AES.new(key, AES.MODE_CBC, iv).decrypt(blob2)
+
+    with open(output_path, "wb") as f:
+        f.write(blob2_dec)
 
 
-print(type(blob2_aes_iv))
-with open("blob2.bin", "rb") as f:
-    encrypted_blob2 = f.read()
-
-aes_egnine = AES.new(blob2_aes_key, AES.MODE_ECB)
-
-plain_blob2 = aes_egnine.decrypt(encrypted_blob2)
-
-with open("blob2_plain.bin", "wb") as f:
-    f.write(plain_blob2)
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    if len(args) < 3:
+        print("Usage: blob2_path output_path key [iv]")
+    else:
+        decrypt_blob2(*args)
