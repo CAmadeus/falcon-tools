@@ -57,7 +57,7 @@ void grant_heavy_secure_mode_privileges() {
         // Set $c3 as the key register for encryption/decryption operations.
         ckeyreg($c3);
 
-        // Encrypt the seed in crypto register 7 itno crypto register 3.
+        // Encrypt the seed in crypto register 7 into crypto register 3.
         cenc($c3, $c7);
 
         // Set crypto register 3 as the key register for encryption/decryption again.
