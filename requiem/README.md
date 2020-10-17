@@ -43,7 +43,7 @@ While the above procedure holds true, there's more to it in the details.
 Upon hitting a code page marked secret, Falcon will jump into its internal ROM segment where roughly equivalent code will be executed:
 
 ```c
-void grant_heavy_secure_mode_privileges() {
+void perform_heavy_secure_mode_entry() {
     uint32_t microcode_start = (*SEC & 0xFF) << 8;
     uint32_t microcode_size = ((*SEC >> 24) & 0xFF) << 8;
 
@@ -69,6 +69,7 @@ void grant_heavy_secure_mode_privileges() {
         // Compare the resulting MAC in crypto register 4 with the hash in crypto register 6.
         // Heavy Secure mode will be granted by FSMs in hardware afterwards if the check succeeds.
         csigcmp($c4, $c6);
+        return;
     }
 
     raise_exception(OP_SECURE_FAULT);
