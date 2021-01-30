@@ -60,18 +60,18 @@ def extract_fw(fw_path, output_path):
      ) = struct.unpack("16s16s16s16s16s16s16sIIIII124x", key_data)
 
     blob_pos = 0
-    blob_pos = dump_blob(output_path + "/blob0.bin",
+    blob_pos = dump_blob(output_path + "/Boot.bin",
                          fw_data, blob_pos, blob0_size)
     # skip key data
     if blob_pos == key_blob_data_pos:
         blob_pos += 0x100
-    blob_pos = dump_blob(output_path + "/blob1.bin",
+    blob_pos = dump_blob(output_path + "/KeygenLdr.bin",
                          fw_data, blob_pos, blob1_size)
-    blob_pos = dump_blob(output_path + "/blob2.bin",
+    blob_pos = dump_blob(output_path + "/Keygen.bin",
                          fw_data, blob_pos, blob2_size)
-    blob_pos = dump_blob(output_path + "/blob4.bin",
+    blob_pos = dump_blob(output_path + "/SecureBoot.bin",
                          fw_data, blob_pos, blob4_size)
-    blob_pos = dump_blob(output_path + "/blob3.bin",
+    blob_pos = dump_blob(output_path + "/SecureBootLdr.bin",
                          fw_data, blob_pos, blob3_size)
 
 

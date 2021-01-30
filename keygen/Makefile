@@ -1,6 +1,6 @@
 NAME := main
 PACKED_NAME := tsec_fw
-STAGE2_PATH = ../payloads/hovi/1.0.0/dec_keygen.bin
+STAGE2_PATH = ../payloads/hovi/1.0.0/Keygen.dec.bin
 STAGE2_AUTH = 892A36228D49E0484D480CB0ACDA0234
 
 KEYGEN_DIR = .
