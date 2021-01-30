@@ -6,6 +6,8 @@ from binascii import unhexlify
 
 from Crypto.Cipher import AES
 
+NULL_KEY = b"\x00" * AES.block_size
+
 
 def decrypt_blob2(blob2_path, output_path, key, iv=None):
     with open(blob2_path, "rb") as f:
@@ -22,5 +24,9 @@ if __name__ == "__main__":
     if len(args) < 3:
         print("Usage: blob2_path output_path key [iv]")
     else:
-        decrypt_blob2(args[0], args[1], unhexlify(args[2]), unhexlify(
-            args[3]) if args[3] else unhexlify("00000000000000000000000000000000"))
+        decrypt_blob2(
+            args[0],
+            args[1],
+            unhexlify(args[2]),
+            unhexlify(args[3]) if args[3] else NULL_KEY
+        )
