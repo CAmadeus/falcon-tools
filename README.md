@@ -14,6 +14,9 @@ Nintendo Switch TSEC firmware.
 * [keygen](./keygen): A ROP chain targetting the Keygen stage of the TSEC firmware, which generates and
 dumps a "fake signing" key
 
+* [secureboot](./secureboot): A payload that decrypts the SecureBoot stage into memory using csecret 6,
+allowing the user to obtain the plaintext of this stage
+
 * [requiem](./requiem): A template for writing fake-signed Falcon microcode that runs a payload in
 Heavy Secure mode; Useful for research and reversing
 
@@ -77,6 +80,15 @@ into Heavy Secure mode, there are plenty of uses for this:
 
 * Decrypting payloads encrypted with csecret 6 (such as the final SecureBoot stage), which is usually done
 by the BootROM during authentication through setting a special bit in a register.
+
+9. Build the [`secureboot`](./secureboot) payload using `make` and run it. After that, dump the TSEC DMEM
+(see [faucon_launcher](https://github.com/CAmadeus/faucon_launcher) for a reference implementation through
+button input) to SD card and extract the decrypted blob starting from address 0. It can then be analyzed
+using [ghidra_falcon](https://github.com/Thog/ghidra_falcon) or another disassembler.
+
+With all these steps combined, one can obtain the plaintexts of a few specific hardware secrets along with
+the plaintext blobs of each stage of the TSEC firmware for research and analysis, which makes this obscure
+black box more accessible towards other people without a background in Falcon security.
 
 ## Credits
 
