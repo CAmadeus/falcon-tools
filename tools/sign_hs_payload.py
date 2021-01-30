@@ -27,14 +27,13 @@ def craft_key_table(auth_hash, seed, payload_len):
 
 
 def calculate_davies_meyer_mac(data, address):
-    address = 0
     ciphertext = bytearray(AES.block_size)
 
     for i in range(0, len(data), 0x100):
         blocks = data[i:i + 0x100] + pack("<IIII", address, 0, 0, 0)
         for k in range(0, len(blocks), AES.block_size):
-            block_cipher = AES.new(blocks[k:k + AES.block_size], AES.MODE_ECB).encrypt(ciphertext)
-            ciphertext = sxor(block_cipher, ciphertext)
+            aes = AES.new(blocks[k:k + AES.block_size], AES.MODE_ECB)
+            ciphertext = sxor(aes.encrypt(ciphertext), ciphertext)
 
         address += 0x100
 
