@@ -47,9 +47,9 @@ Package1 as a command line argument. The script extracts the TSEC firmware and c
 binary in the same directory.
 
 4. Invoke the [`hovi_stage_extractor.py`](./tools/hovi_stage_extractor.py) script with the path to the
-**directory** containing the previously extracted `tsec_fw.bin` blob, not the path to the blob itself
+**directory** containing the previously extracted `tsec_fw.bin` blob, not the path to the blob itself,
 as a command line argument. It will output a folder `stages` in that directory which contains all the
-individual stages the TSEC firmware is composed of.
+individual stages the TSEC firmware is composed of split up into separate binaries.
 
 5. Copy `stages/KeygenLdr.bin` and `stages/Keygen.bin` from the previous step to `payloads/hovi/1.0.0`.
 These payloads have never changed since day 1, that's why the Package1 version does not matter here.
@@ -61,12 +61,12 @@ unlikely to change ever again in the future (and so are the keys it generates).
 (`code_sig_01`, `code_enc_01`) in the Makefile. Depending on the ROP chain, a different key will be copied
 to the SOR1 HDCP registers.
 
-* `CODE_SIG_01` is used for AES-CMAC of the Boot stage in KeygenLdr. If you want to launch KeygenLdr with
-a customized Boot stage, use [`tools/hovi_keygenldr_auth_boot.py`](./tools/hovi_keygenldr_auth_boot.py) to
-sign your own blob using this key.
+* `CODE_SIG_01` is the AES key used for AES-CMAC over the Boot stage in KeygenLdr. If you want to launch
+KeygenLdr with a customized Boot stage, use [`tools/hovi_keygenldr_auth_boot.py`](./tools/hovi_keygenldr_auth_boot.py)
+to sign your own blob using this key.
 
-* `CODE_ENC_01` is used for decrypting the following Keygen stage using AES-CBC. Dump this key and use
-[`tools/decrypt_blob2.py`](./tools/decrypt_blob2.py) to decrypt `payloads/hovi/1.0.0/Keygen.bin` to
+* `CODE_ENC_01` is the key used for decrypting the following Keygen stage using AES-CBC. Dump this key and
+use [`tools/decrypt_blob2.py`](./tools/decrypt_blob2.py) to decrypt `payloads/hovi/1.0.0/Keygen.bin` to
 `payloads/hovi/1.0.0/Keygen.dec.bin` **before advancing to the next step**.
 
 7. Build the [`keygen`](./keygen) ROP chain using `make` and run it. It will exploit the previously
@@ -84,8 +84,9 @@ into Heavy Secure mode, there are plenty of uses for this:
 * Decrypting payloads encrypted with csecret 6 (such as the final SecureBoot stage), which is usually done
 by the BootROM during authentication through setting a special bit in a register.
 
-9. Build the [`secureboot`](./secureboot) payload using `make` and run it. After that, dump the TSEC DMEM
-(see [faucon_launcher](https://github.com/CAmadeus/faucon_launcher) for a reference implementation through
+9. Build the [`secureboot`](./secureboot) payload by first providing `SEED` and `KEY` in the Makefile for
+fake signing and then running `make`. Launch the resulting blob and dump the TSEC DMEM (see
+[faucon_launcher](https://github.com/CAmadeus/faucon_launcher) for a reference implementation through
 button input) to SD card and extract the decrypted blob starting from address 0. It can then be analyzed
 using [ghidra_falcon](https://github.com/Thog/ghidra_falcon) or another disassembler.
 
