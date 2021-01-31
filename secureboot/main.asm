@@ -110,24 +110,23 @@ hs_main:
     bclr $r14 19
     mov $cauth $r14
 
-    // Set the target port for DMA transfers to DMEM.
+    // Set the target port for DMA transfers.
     mov $r14 0x0
     mov $xtargets $r14
 
-    // Wait for all code and data loads/stores to complete.
+    // Wait for all DMA code and data loads/stores to complete.
     xdwait
     xcwait
-
-    // Write the first ciphertext word to mailbox 0 for comparison.
-    mov $r11 #FALCON_MAILBOX0
-    clear b32 $r12
-    ld b32 $r12 D[$r12]
-    iowr I[$r11] $r12
 
     // Decrypt the Falcon OS image into DMEM via DMA.
     clear b32 $r10
     ld b32 $r11 D[key_data_addr + 0x24]
     lcall #decrypt_cauth_payload
+
+    // Transfer decrypted Falcon OS into external BPMP memory.
+    clear b32 $r10
+    ld b32 $r11 D[key_data_addr + 0x24]
+    lcall #dma_transfer_to_bpmp_iram
 
     // Write the first plaintext word to mailbox 1 for comparison.
     mov $r11 #FALCON_MAILBOX1
@@ -171,6 +170,31 @@ __decrypt_cauth_payload_loop:
     sub b32 $r11 0x100
 
     bra b32 $r11 0x0 ne #__decrypt_cauth_payload_loop
+    ret
+
+
+dma_transfer_to_bpmp_iram:
+    // Prepare the external base address for DMA to BPMP.
+    mov $r8 #FALCON_MAILBOX0
+    iord $r9 I[$r8]
+    add b32 $r9 $r9 $r10
+    shr b32 $r9 0x8
+    mov $xdbase $r9
+
+    // Prepare DMA xfer arguments.
+    clear b32 $r8
+    mov b16 $r9 $r10
+    sethi $r9 0x60000
+
+    // Update state by advancing to the next page.
+    add b32 $r10 $r10 0x100
+    sub b32 $r11 0x100
+
+    // Kick off the DMA code store operation.
+    xdst $r8 $r9
+    xdwait
+
+    bra b32 $r11 0x0 ne #dma_transfer_to_bpmp_iram
     ret
 
 popdef(`key_data_addr')
