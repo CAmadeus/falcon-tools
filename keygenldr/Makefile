@@ -1,6 +1,6 @@
 NAME := main
 PACKED_NAME := tsec_fw
-STAGE1_PATH = ../payloads/hovi/1.0.0/keygenldr.bin
+STAGE1_PATH = ../payloads/hovi/1.0.0/KeygenLdr.bin
 STAGE1_AUTH = 9c8b75d3df0bf06c95fc91c0761ef062
 
 KEYGENLDR_DIR = .

@@ -3,3 +3,4 @@ reverse/
 *.bin
 *_fw.h
 *_fw_real.asm
+rop.asm
