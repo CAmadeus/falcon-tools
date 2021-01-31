@@ -42,6 +42,13 @@ main:
     mov $r14 0x1
     lcall #memcpy_d2i
 
+    // Copy the encrypted Falcon OS image to DMEM.
+    clear b32 $r10
+    mov $r11 #FALCON_OS_START
+    add b32 $r11 $r11 0x100
+    ld b32 $r12 D[key_data_addr + 0x24]
+    lcall #memcpy_i2d
+
     // Transfer the MAC of the secure payload into crypto register 6.
     clear b32 $r7
     mov b32 $r8 key_data_addr
@@ -71,8 +78,6 @@ main:
 
     mpopaddret $r8 0x11C
 
-popdef(`key_data_addr')
-
 include(`mmio.asm')
 include(`memcpy_i2d.asm')
 include(`memcpy_d2i.asm')
@@ -92,6 +97,33 @@ HS_PAYLOAD_PHYS_ADDR:
 .equ #HS_PAYLOAD_START 0x200
 
 hs_main:
+    // Clear all interrupt bits.
+    bclr $flags ie0
+    bclr $flags ie1
+    bclr $flags ie2
+
+    // Clear all DMA overrides.
+    cxset 0x80
+
+    // Clear bit 19 in $cauth to not supress interrupts/exceptions.
+    mov $r14 $cauth
+    bclr $r14 19
+    mov $cauth $r14
+
+    // Set the target port for DMA transfers to DMEM.
+    mov $r14 0x0
+    mov $xtargets $r14
+
+    // Wait for all code and data loads/stores to complete.
+    xdwait
+    xcwait
+
+    // Decrypt the Falcon OS image into DMEM via DMA.
+    clear b32 $r10
+    ld b32 $r11 D[key_data_addr + 0x24]
+    lcall #decrypt_cauth_payload
+
+    // Write a result code to mailbox.
     mov $r11 #FALCON_MAILBOX1
     mov $r12 0xBADC0DED
     iowr I[$r11] $r12
@@ -99,6 +131,42 @@ hs_main:
     // Clear the HS signature and return back to NS mode.
     csigclr
     ret
+
+decrypt_cauth_payload:
+    // Load in csecret 6 for decryptions.
+    csecret $c5 0x6
+    ckexp $c5 $c5
+    ckeyreg $c5
+
+    // Prepare a crypto script that decrypts one block at a time.
+    cs0begin 0x3
+        cxsin $c3
+        cdec $c4 $c3
+        cxsout $c4
+
+__decrypt_cauth_payload_loop:
+    // Prepare the transfer of a whole page into the crypto stream.
+    mov b32 $r9 $r10
+    sethi $r9 0x60000
+
+    // Execute the crypto script 10 times (processes a whole page).
+    cs0exec 0x10
+
+    // Execute the DMA transfers into and out of the crypto stream.
+    cxset 0x21
+    xdst $r9 $r9
+    cxset 0x22
+    xdld $r9 $r9
+    xdwait
+
+    // Update state by advancing to the next page.
+    add b32 $r10 $r10 0x100
+    sub b32 $r11 0x100
+
+    bra b32 $r11 0x0 ne #__decrypt_cauth_payload_loop
+    ret
+
+popdef(`key_data_addr')
 
 .align 0x100
 FALCON_OS_START:
