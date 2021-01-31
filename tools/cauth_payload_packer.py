@@ -59,7 +59,9 @@ def extract_falcon_os(image):
         falcon_header[0x10:0x14], "little")
     falcon_os_size = int.from_bytes(falcon_os_header[0x4:0x8], "little")
 
-    return image[falcon_code_header_size:falcon_code_header_size + falcon_os_size]
+    falcon_os_start = falcon_code_header_size + 0x100
+    falcon_os_end = falcon_os_start + (falcon_os_size - 0x100)
+    return image[falcon_os_start:falcon_os_end]
 
 
 def main(firmware, cauth_payload, output, key, seed):
