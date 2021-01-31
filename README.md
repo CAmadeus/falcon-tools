@@ -9,7 +9,7 @@ reversing Nintendo's TSEC firmwares in Package1 and nvservices.
 ## Components
 
 * [keygenldr](./keygenldr): A set of ROP chains for obtaining keys used by the KeygenLdr payload of the
-Nintendo Switch TSEC firmware.
+Nintendo Switch TSEC firmware
 
 * [keygen](./keygen): A ROP chain targetting the Keygen stage of the TSEC firmware, which generates and
 dumps a "fake signing" key
@@ -22,6 +22,9 @@ Heavy Secure mode; Useful for research and reversing
 
 * [libfaucon](./libfaucon): A standard library for Falcon firmware development; Features implementations
 of commonly used functions and definitions for MMIO registers
+
+* [payloads](./payloads): A placeholder directory for Falcon firmware blobs which are exploited through
+other components in this repository
 
 * [tools](./tools): Helper scripts for working with TSEC firmware blobs
 
