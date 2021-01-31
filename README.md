@@ -85,9 +85,8 @@ into Heavy Secure mode, there are plenty of uses for this:
 by the BootROM during authentication through setting a special bit in a register.
 
 9. Build the [`secureboot`](./secureboot) payload by first providing `SEED` and `KEY` in the Makefile for
-fake signing and then running `make`. Launch the resulting blob and dump the TSEC DMEM (see
-[faucon_launcher](https://github.com/CAmadeus/faucon_launcher) for a reference implementation through
-button input) to SD card and extract the decrypted blob starting from address 0. It can then be analyzed
+fake signing and then running `make`. Launch the resulting blob, dump the TSEC DMEM to SD card and
+extract the decrypted blob starting from address 0 out of the whole memory dump. It can then be analyzed
 using [ghidra_falcon](https://github.com/Thog/ghidra_falcon) or another disassembler.
 
 With all these steps combined, one can obtain the plaintexts of a few specific hardware secrets along with
