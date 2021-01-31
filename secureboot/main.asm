@@ -118,14 +118,21 @@ hs_main:
     xdwait
     xcwait
 
+    // Write the first ciphertext word to mailbox 0 for comparison.
+    mov $r11 #FALCON_MAILBOX0
+    clear b32 $r12
+    ld b32 $r12 D[$r12]
+    iowr I[$r11] $r12
+
     // Decrypt the Falcon OS image into DMEM via DMA.
     clear b32 $r10
     ld b32 $r11 D[key_data_addr + 0x24]
     lcall #decrypt_cauth_payload
 
-    // Write a result code to mailbox.
+    // Write the first plaintext word to mailbox 1 for comparison.
     mov $r11 #FALCON_MAILBOX1
-    mov $r12 0xBADC0DED
+    clear b32 $r12
+    ld b32 $r12 D[$r12]
     iowr I[$r11] $r12
 
     // Clear the HS signature and return back to NS mode.
