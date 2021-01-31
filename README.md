@@ -33,8 +33,8 @@ Prerequisites: Install Python 3.6+ on your machine and get the `PyCryptodome` pa
 you will need [envytools](https://github.com/envytools/envytools), `make`, `m4` and `bin2c` on your system.
 
 1. Clone this repository and set up an environment for controlling a TSEC engine, e.g. through RCM payloads
-on the Nintendo Switch. We're using a fork of hekate, with GUI adapted to launch a TSEC payload which is
-included through the bin2c header.
+on the Nintendo Switch. We're providing a fork of hekate, with GUI adapted to launch a TSEC payload
+[right here](https://github.com/CAmadeus/faucon_launcher).
 
 2. Get a dump of Package1, preferably from firmware **8.1.0** or **1.0.0**. You don't need to bring the
 keys to decrypt the PK11 blob, the TSEC firmware is bundled in its plaintext for Package1ldr.
