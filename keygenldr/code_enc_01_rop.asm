@@ -21,16 +21,16 @@
 .b32 0x5B8
 
 // $r10 = 1
-// $r11 = 6100  ; Although NVIDIA passes 1, any non-zero value will do.
+// $r11 = 6100
 // -----------------
 // lbra #gen_usr_key
 .b32 0x647
 
 // mpopret $r0
 .b32 0x53D
-.b32 0x4
+.b32 0x1
 
-// $r0  = 4
+// $r0  = 1
 // -------------------
 // mov b32 $r10 $r0
 // add $sp 0x4
@@ -53,7 +53,7 @@
 .b32 0
 .b32 0
 
-// $r10 = 4
+// $r10 = 1
 // $r11 = 990
 // -----------------
 // lbra #crypto_load
