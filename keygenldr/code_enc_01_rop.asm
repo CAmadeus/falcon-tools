@@ -2,8 +2,8 @@
 // A ROP chain designed to dump the "CODE_ENC_01" AES key that is used to
 // decrypt the blob for the next stage, Keygen.
 //
-// gen_usr_key(1, 1);
-// crypto_load(4, 0x990);
+// gen_usr_key(1, 0x6100);
+// crypto_load(1, 0x990);
 //
 
 // We're going to copy the resulting key to this address in Falcon DMem.
