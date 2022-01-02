@@ -25,10 +25,10 @@ $(PACKED_NAME).bin: $(NAME)_fw.bin
 	@$(TOOLS_DIR)/cauth_payload_packer.py $? $(SECUREBOOT_PATH) $@ $(KEY) $(SEED)
 
 $(NAME)_fw.h: $(NAME)_fw.bin
-	@bin2c -o $@ $?
+	@$(TOOLS_DIR)/bin2c.py -o $@ $?
 
 $(PACKED_NAME).h: $(PACKED_NAME).bin
-	@bin2c -o $@ $?
+	@$(TOOLS_DIR)/bin2c.py -o $@ $?
 
 print_dis: $(NAME)_fw.bin
 	@envydis -i $? -m falcon -V fuc5 -F crypt -n

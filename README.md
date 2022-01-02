@@ -33,7 +33,7 @@ other components in this repository
 With the components out of the way, the order for using these ROP chains on hardware is as following:
 
 Prerequisites: Install Python 3.6+ on your machine and get the `PyCryptodome` package via `pip`. Additionally,
-you will need [envytools](https://github.com/envytools/envytools), `make`, `m4` and `bin2c` on your system.
+you will need [envytools](https://github.com/envytools/envytools), `make`, `m4` on your system.
 
 1. Clone this repository and set up an environment for controlling a TSEC engine, e.g. through RCM payloads
 on the Nintendo Switch. We're providing a fork of hekate, with GUI adapted to launch a TSEC payload
